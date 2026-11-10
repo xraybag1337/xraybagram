@@ -23,6 +23,11 @@ jobs:
             sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           fi
           xcodebuild -version
+
+      - name: Ensure iOS Simulator Runtime
+        run: |
+          xcrun simctl list > /dev/null
+          xcodebuild -downloadPlatform iOS || echo "Download failed, continuing anyway..."
           
       - name: Create canonical source directory
         run: |
