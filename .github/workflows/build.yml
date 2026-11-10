@@ -35,22 +35,6 @@ jobs:
           sudo mkdir -p /Users/Shared
           cp -R $GITHUB_WORKSPACE /Users/Shared/
           mv /Users/Shared/$(basename $GITHUB_WORKSPACE) /Users/Shared/telegram-ios
-
-      - name: Patch Provisioning Profiles
-        run: |
-          set -x
-          cd /Users/Shared/telegram-ios
-          # Находим все файлы .mobileprovision в папке fake-codesigning
-          find build-system/fake-codesigning -name "*.mobileprovision" | while read file; do
-            echo "Patching $file"
-            # Конвертируем бинарный plist в XML, меняем дату, конвертируем обратно
-            security cms -D -i "$file" > temp.plist
-            /usr/libexec/PlistBuddy -c "Set :ExpirationDate 2030-10-30T17:06:30Z" temp.plist
-            # Внимание: security cms -S обратно в бинарный формат может не сработать без сертификата, 
-            # поэтому просто сохраняем как XML (Xcode схавает)
-            cp temp.plist "$file"
-            rm temp.plist
-          done
           
       - name: Build xraybagram IPA
         run: |
