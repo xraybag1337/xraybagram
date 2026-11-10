@@ -46,18 +46,15 @@ jobs:
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           
-          # Вставляем фейковые сертификаты (без них Bazel не видит mobileprovision)
-          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
-          
           python3 -u build-system/Make/Make.py \
             --overrideXcodeVersion \
             --overrideBazelVersion \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
             build \
             --configurationPath="build-system/ghostgram-configuration.json" \
-            --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
             --buildNumber="$BUILD_NUMBER" \
+            --xcodeManagedCodesigning \
             --outputBuildArtifactsPath="$SOURCE_DIR/build/artifacts"
             
           OUTPUT_PATH="$SOURCE_DIR/build/artifacts"
