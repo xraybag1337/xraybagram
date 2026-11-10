@@ -35,7 +35,20 @@ jobs:
           sudo mkdir -p /Users/Shared
           cp -R $GITHUB_WORKSPACE /Users/Shared/
           mv /Users/Shared/$(basename $GITHUB_WORKSPACE) /Users/Shared/telegram-ios
-          
+
+      - name: Fix Provisioning Profiles
+        run: |
+          set -x
+          cd /Users/Shared/telegram-ios
+          EXPIRY_DATE="2030-10-30T17:06:30Z"
+          for f in $(find build-system/fake-codesigning/profiles -name "*.mobileprovision" 2>/dev/null); do
+            echo "Patching $f"
+            security cms -D -i "$f" > temp.plist 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Set :ExpirationDate $EXPIRY_DATE" temp.plist 2>/dev/null || true
+            cp temp.plist "$f"
+            rm -f temp.plist
+          done
+
       - name: Build xraybagram IPA
         run: |
           set -x
@@ -57,7 +70,6 @@ jobs:
             --overrideXcodeVersion \
             --overrideBazelVersion \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
-            --bazelArguments="--define=apple.disable_signing=1" \
             build \
             --configurationPath="build-system/ghostgram-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
