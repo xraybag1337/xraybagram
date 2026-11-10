@@ -57,6 +57,7 @@ jobs:
             --overrideXcodeVersion \
             --overrideBazelVersion \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
+            --bazelArguments="--define=apple.disable_signing=1" \
             build \
             --configurationPath="build-system/ghostgram-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
